@@ -9,7 +9,8 @@ CAN_CONFIG = {
     'channel': '/dev/tty.usbmodem*',
     'bitrate': 500000,
     'trigger_id': 0x200,
-    'data_id': 0x100
+    'data_id': 0x100,
+    'data_format': 'ii'  # Format string for struct.pack: two int32 values
 }
 
 # Eye Detection Configuration
@@ -43,5 +44,5 @@ DISPLAY = {
 
 # Error Values
 ERROR_VALUES = {
-    'no_eyes_detected': (-1.0, -1.0)
+    'no_eyes_detected': (-1, -1)  # Changed to integers for int32 packing
 }

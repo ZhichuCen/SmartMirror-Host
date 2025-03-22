@@ -1,6 +1,7 @@
 import cv2
 import sys
 from eye_utils import get_camera, detect_eyes
+from config import DISPLAY, EYE_DETECTION
 
 
 def main():
@@ -42,7 +43,7 @@ def main():
             print(f"Eye midpoint: {eye_midpoint}")
 
         # Display the resulting frame
-        cv2.imshow('Eye Position Detection', processed_frame)
+        cv2.imshow(DISPLAY['window_name'], processed_frame)
 
         # Exit if 'Esc' is pressed
         if cv2.waitKey(1) & 0xFF == 27:
