@@ -2,11 +2,23 @@
 Configuration settings for the eye detection system.
 Centralizes all parameters for easier management.
 """
+import platform
+import os
+
+# Detect operating system
+CURRENT_OS = platform.system()
+
+# Define platform-specific CAN channel paths
+CAN_CHANNELS = {
+    'Windows': 'COM14',  # Default Windows COM port for CAN devices
+    'Darwin': '/dev/tty.usbmodem*',  # macOS
+    'Linux': '/dev/ttyUSB0'  # Linux
+}
 
 # CAN Bus Configuration
 CAN_CONFIG = {
     'bustype': 'slcan',
-    'channel': '/dev/tty.usbmodem*',
+    'channel': CAN_CHANNELS.get(CURRENT_OS, 'COM3'),  # Default to COM3 if OS not found
     'bitrate': 500000,
     'trigger_id': 0x200,
     'data_id': 0x100,

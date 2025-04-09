@@ -3,6 +3,7 @@ import sys
 import can
 import struct
 import time
+import platform
 from eye_utils import get_camera, detect_eyes
 from config import CAN_CONFIG, EYE_DETECTION, DISPLAY, ERROR_VALUES
 
@@ -10,9 +11,26 @@ from config import CAN_CONFIG, EYE_DETECTION, DISPLAY, ERROR_VALUES
 def init_can_interface():
     """Initialize the CAN interface for communication"""
     try:
+        # Check if serial module is available if using slcan
+        if CAN_CONFIG.get('interface', CAN_CONFIG.get('bustype')) == 'slcan':
+            try:
+                import serial
+                # List available serial ports if on Windows and there's an error
+                if platform.system() == 'Windows':
+                    available_ports = []
+                    try:
+                        from serial.tools import list_ports
+                        available_ports = [port.device for port in list_ports.comports()]
+                    except ImportError:
+                        pass
+            except ImportError:
+                print("Error: Serial module not installed but required for slcan")
+                print("Please install it using: pip install pyserial")
+                sys.exit(1)
+                
         # Initialize the CAN bus interface using config values
         bus = can.interface.Bus(
-            bustype=CAN_CONFIG['bustype'],
+            interface=CAN_CONFIG.get('interface', CAN_CONFIG['bustype']),
             channel=CAN_CONFIG['channel'],
             bitrate=CAN_CONFIG['bitrate']
         )
@@ -20,6 +38,19 @@ def init_can_interface():
         return bus
     except Exception as e:
         print(f"Error initializing CAN interface: {e}")
+        # Provide more helpful error message for Windows users
+        if platform.system() == 'Windows':
+            try:
+                from serial.tools import list_ports
+                available_ports = [port.device for port in list_ports.comports()]
+                if available_ports:
+                    print(f"Available COM ports: {', '.join(available_ports)}")
+                    print(f"Please update the channel in config.py to one of these ports")
+                else:
+                    print("No available COM ports detected. Please ensure your device is connected.")
+            except ImportError:
+                print("For Windows, check Device Manager to find the correct COM port")
+                print("Then update the 'channel' value in config.py")
         print("Please ensure the canable device is connected and properly configured")
         sys.exit(1)
 
