@@ -18,7 +18,7 @@ CAN_CHANNELS = {
 # CAN Bus Configuration
 CAN_CONFIG = {
     'bustype': 'slcan',
-    'channel': CAN_CHANNELS.get(CURRENT_OS, 'COM3'),  # Default to COM3 if OS not found
+    'channel': CAN_CHANNELS.get(CURRENT_OS, 'COM14'),  # Default to COM3 if OS not found
     'bitrate': 500000,
     'trigger_id': 0x200,
     'data_id': 0x100,

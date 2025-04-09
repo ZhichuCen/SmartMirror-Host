@@ -70,7 +70,8 @@ def send_eye_coordinates(can_bus, x, y):
         
         # Create and send the CAN message
         message = can.Message(
-            arbitration_id=CAN_CONFIG['data_id'],
+            # arbitration_id=CAN_CONFIG['data_id'],
+            arbitration_id = 0x100,
             data=data,
             is_extended_id=False
         )
