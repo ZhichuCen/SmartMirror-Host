@@ -58,25 +58,43 @@ def init_can_interface():
 def send_eye_coordinates(can_bus, x, y):
     """Send eye midpoint coordinates via CAN with ID 0x100
     
-    Coordinates are sent as int32 values (4 bytes each)
+    Coordinates are normalized to 0-100 range before sending
     """
     try:
-        # Convert coordinates to integers if they're not already
-        x_int = int(x)
-        y_int = int(y)
+        # Get camera resolution for normalization
+        camera = get_camera()
+        if not camera.isOpened():
+            print("Error: Could not open camera for resolution check")
+            return False
+            
+        # Get frame to determine resolution
+        ret, frame = camera.read()
+        if not ret:
+            print("Error: Could not read frame for resolution check")
+            return False
+            
+        height, width = frame.shape[:2]
+        camera.release()
         
-        # Pack the x and y coordinates using the format from config
-        data = struct.pack(CAN_CONFIG['data_format'], x_int, y_int)
+        # Normalize coordinates to 0-100 range
+        x_normalized = int((x / width) * 100)
+        y_normalized = int((y / height) * 100)
+        
+        # Ensure values are within 0-100 range
+        x_normalized = max(0, min(100, x_normalized))
+        y_normalized = max(0, min(100, y_normalized))
+        
+        # Pack the normalized coordinates using the format from config
+        data = struct.pack(CAN_CONFIG['data_format'], x_normalized, y_normalized)
         
         # Create and send the CAN message
         message = can.Message(
-            # arbitration_id=CAN_CONFIG['data_id'],
-            arbitration_id = 0x100,
+            arbitration_id=0x100,
             data=data,
             is_extended_id=False
         )
         can_bus.send(message)
-        print(f"Sent eye coordinates: x={x_int}, y={y_int}")
+        print(f"Sent normalized eye coordinates: x={x_normalized}, y={y_normalized}")
         return True
     except Exception as e:
         print(f"Error sending CAN message: {e}")

@@ -10,7 +10,7 @@ CURRENT_OS = platform.system()
 
 # Define platform-specific CAN channel paths
 CAN_CHANNELS = {
-    'Windows': 'COM14',  # Default Windows COM port for CAN devices
+    'Windows': 'COM10',  # Default Windows COM port for CAN devices
     'Darwin': '/dev/tty.usbmodem*',  # macOS
     'Linux': '/dev/ttyUSB0'  # Linux
 }
@@ -18,7 +18,7 @@ CAN_CHANNELS = {
 # CAN Bus Configuration
 CAN_CONFIG = {
     'bustype': 'slcan',
-    'channel': CAN_CHANNELS.get(CURRENT_OS, 'COM14'),  # Default to COM3 if OS not found
+    'channel': CAN_CHANNELS.get(CURRENT_OS, 'COM10'),  # Default to COM3 if OS not found
     'bitrate': 500000,
     'trigger_id': 0x200,
     'data_id': 0x100,
@@ -56,5 +56,5 @@ DISPLAY = {
 
 # Error Values
 ERROR_VALUES = {
-    'no_eyes_detected': (-1, -1)  # Changed to integers for int32 packing
+    'no_eyes_detected': (50, 50)  # Center point (50,50) as error value
 }
